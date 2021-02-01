@@ -1,0 +1,232 @@
+﻿<html>
+
+<head>
+
+    <title>Sherlock Homepage</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" integrity="sha384-Nlo8b0yiGl7Dn+BgLn4mxhIIBU6We7aeeiulNCjHdUv/eKHx59s3anfSUjExbDxn" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha384-Dziy8F2VlJQLMShA6FHWNul/veM9bCkRUaLqr199K94ntO5QUrLJBEbYegdSkkqX" crossorigin="anonymous"></script>
+
+    <!---------------------------------------------------------------------------styles------------------------------------------------------------------->
+    <style type="text/css">
+        #header {
+            height: 100px;
+            width: auto;
+            margin: 0px;
+            color: #0FB784;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            font-stretch: wider;
+            vertical-align: top;
+            font-size: 200%;
+            font-weight: 2000;
+        }
+        #headerText {
+            position: relative;
+            top: 240%;
+            text-shadow: 1px 1px 100px black;
+            background-color: black;
+            opacity: 0.8;           
+        }
+        
+        #content {
+            background-color: #108769;
+            justify-content: center;
+            margin: 0;
+            align-content: center;
+            text-align: center;
+        }
+        #mainBody { 
+            background-image: url("background1.jpg"); 
+            height: 80%;
+        }
+        #bodyContent {
+            padding-top: 20%
+        }
+        #query {
+            padding: 10px;
+            margin: 30px;
+            height: 35px;
+            width: 75%;
+            resize: none;
+            overflow: auto;
+        }
+        #searchResults {
+            background-image: none;
+        }
+        #time {
+            overflow: auto;
+        }
+
+        #searchButton {}
+        #timeButton {}
+        #luckyButton {}
+        #qrButton {}
+
+
+        .button {
+            height: 30px;
+            width: 200px;
+        }
+        .borders {
+            border: solid;
+            border-color: black;
+            border-width: thin;
+        }
+    </style>
+
+</head>
+
+<!----------------------------------------------------------The code that renders to screen-------------------------------------------------------------->
+<body id="content">
+    <header id="header">
+        <h1 id="headerText">Sherlock Homepage</h1>
+    </header>
+    <main id="mainBody">
+        <div id="bodyContent">
+            <input id="query" class="borders" autofocus>
+            <div>
+                <button id="searchButton" class="button borders">Search</button>
+                <button id="luckyButton" class="button borders">I'm feeling lucky</button>
+                <button id="timeButton" class="button borders">Display current time</button>
+                <button id="qrButton" class="button borders">Show me a QR code</button>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="searchResults" hidden>
+
+    </div>
+
+    <div id="time" hidden>
+        
+    </div>
+
+
+ <!----------------------------------------------------------------------------------------------------------------------SCRIPTS-------------------------------------------------------------------------------------------------------------------------------->
+   
+    
+    <script type="text/javascript">
+
+//---------------------------------------------------------------------------------------------------------
+//-----------------------------------"Search" button code--------------------------------------------------
+//---------------------------------------------------------------------------------------------------------
+        $("#searchButton").click(function () {
+            runSearch();
+        });
+
+        function runSearch() {
+            var queryVal = $("#query").val();
+            $.ajax(
+                "script.js"
+            ).done(function (data) {
+                apiSearch();
+                clearIt();
+            }).fail(function () {
+                alert("The function failed but at least it ran");
+            });
+        };
+
+//----------------------------------------------------------------------------------------------------------
+//--------------------------------"I'm feeling lucky" button code-------------------------------------------
+//----------------------------------------------------------------------------------------------------------
+        $("#luckyButton").click(function () {
+            feelinLucky();
+        });
+
+        function feelinLucky() {
+            $.ajax(
+                "script.js"
+            ).done(function (data) {
+
+                luckySearch();
+                clearIt();
+ 
+            }).fail(function () {
+                    alert("Lucky search ran but encountered an error");
+            });     
+        };
+//----------------------------------------------------------------------------------------------------------
+//--------------------------------------background changing code-------------------------------------------
+//----------------------------------------------------------------------------------------------------------
+        var imgURL = $("main").css("background-image");
+        function changeBackground() {
+            if (imgURL == 'url("https://localhost:44359/background1.jpg")') {
+                $("main").css("background-image", "url('background2.jpg')");
+                imgURL = 'url("https://localhost:44359/background2.jpg")';
+                $("main").css("height", "80%");
+                console.log(imgURL);
+            } else if (imgURL == 'url("https://localhost:44359/background2.jpg")') {
+                $("main").css("background-image", "url('background3.jpg')");
+                imgURL = 'url("https://localhost:44359/background3.jpg")';
+                $("main").css("height", "80%");
+                console.log(imgURL);
+            } else {
+                $("main").css("background-image", "url('background1.jpg')");
+                imgURL = 'url("https://localhost:44359/background1.jpg")';
+                $("main").css("height", "80%");
+                console.log(imgURL);
+            }
+        };
+
+        $("#header").click(function () {
+            changeBackground();
+            setTimeout(() => { changeBackground(); }, 10000);
+        });
+//----------------------------------------------------------------------------------------------------------
+//--------------------------------------clear search query--------------------------------------------------
+//----------------------------------------------------------------------------------------------------------
+
+        function clearIt() {
+            $("#query").val('');
+        }
+
+//----------------------------------------------------------------------------------------------------------
+//--------------------------------------displaying the time-------------------------------------------------
+//----------------------------------------------------------------------------------------------------------
+
+        $("#timeButton").click(function () {
+            setTime();
+            displayTime();
+        })
+
+        function displayTime() {
+            
+            $("#time").dialog({
+                show: { effect: "blind", duration: 500 },
+                title: $("#time").val()
+            });
+        };
+
+        function setTime() {
+            var aqui = new Date();
+            var offsetAqui = aqui.getTimezoneOffset() * 60 * 1000;
+            var dateAqui = new Date(aqui.getTime() - offsetAqui);
+            var str = dateAqui.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ");
+            var timeStr = str.split(" ")[1];
+            var timeFinal = timeStr.split(":")[0] + ":" + timeStr.split(":")[1];
+            $("#time").val(timeFinal);
+        }
+//----------------------------------------------------------------------------------------------------------
+//--------------------------------------displaying a qr code------------------------------------------------
+//----------------------------------------------------------------------------------------------------------
+        $("#qrButton").click(function () {
+            displayQRCode();
+        })
+
+        function displayQRCode() {
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode("The text which should be encoded.", QRCodeGenerator.ECCLevel.Q);
+            QRCode qrCode = new QRCode(qrCodeData);
+            Bitmap qrCodeImage = qrCode.GetGraphic(20);
+        }
+
+
+    </script>
+</body>
+
+</html>
